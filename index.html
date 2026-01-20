@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>拆书工坊</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+:root {
+  --bg: #f6f2ea;
+  --bg-ink: #1c1a17;
+  --ink-soft: #3f3a34;
+  --accent: #cf6b2a;
+  --accent-2: #0f6d64;
+  --card: #ffffff;
+  --muted: #ded7cd;
+  --shadow: 0 20px 40px rgba(18, 16, 14, 0.12);
+  --radius-lg: 28px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  color: var(--bg-ink);
+  background: radial-gradient(circle at top, rgba(255, 244, 228, 0.9), rgba(246, 242, 234, 0.9) 55%),
+    linear-gradient(120deg, rgba(207, 107, 42, 0.08), rgba(15, 109, 100, 0.08));
+  min-height: 100vh;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.45;
+  z-index: -1;
+}
+
+body::before {
+  background: rgba(207, 107, 42, 0.35);
+  top: -60px;
+  left: -80px;
+}
+
+body::after {
+  background: rgba(15, 109, 100, 0.35);
+  bottom: -80px;
+  right: -60px;
+}
+
+.page {
+  padding: 40px clamp(20px, 4vw, 80px) 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.hero-text h1 {
+  font-family: "Fraunces", serif;
+  font-size: clamp(36px, 5vw, 64px);
+  margin: 10px 0 16px;
+}
+
+.tag {
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: var(--ink-soft);
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.hero-card {
+  background: var(--card);
+  padding: 24px 28px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(222, 215, 205, 0.6);
+}
+
+.hero-card .card-title {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.hero-card ol {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.control-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+  gap: 24px;
+}
+
+.upload-panel {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  border: 1px dashed rgba(63, 58, 52, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.upload-panel.dragover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.stats-panel {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(222, 215, 205, 0.6);
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(222, 215, 205, 0.6);
+}
+
+.stat:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stat-label {
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+
+.range-panel {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(222, 215, 205, 0.6);
+}
+
+.range-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.range-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.range-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.toggle {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px !important;
+  font-size: 14px;
+}
+
+.range-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 24px;
+}
+
+.chapter-list {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 420px;
+  border: 1px solid rgba(222, 215, 205, 0.6);
+  box-shadow: var(--shadow);
+  overflow: auto;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(222, 215, 205, 0.6);
+}
+
+.list-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.list-meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.chapter-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.chapter-card {
+  background: var(--card);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  border: 1px solid rgba(222, 215, 205, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeUp 0.5s ease;
+}
+
+.chapter-title {
+  font-weight: 700;
+  color: var(--bg-ink);
+}
+
+.chapter-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.chapter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.preview-panel {
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 420px;
+  border: 1px solid rgba(222, 215, 205, 0.6);
+  box-shadow: var(--shadow);
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#preview {
+  flex: 1;
+  width: 100%;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(222, 215, 205, 0.9);
+  padding: 14px;
+  font-family: "Manrope", sans-serif;
+  font-size: 14px;
+  resize: none;
+  background: rgba(246, 242, 234, 0.4);
+}
+
+button,
+.select {
+  font-family: "Manrope", sans-serif;
+}
+
+button {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 109, 100, 0.15);
+}
+
+.primary {
+  background: var(--accent);
+  color: #fffaf4;
+}
+
+.secondary {
+  background: rgba(15, 109, 100, 0.1);
+  color: var(--accent-2);
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid rgba(15, 109, 100, 0.3);
+  color: var(--accent-2);
+}
+
+.select {
+  border-radius: 999px;
+  padding: 10px 16px;
+  border: 1px solid rgba(222, 215, 205, 0.8);
+  background: #fff;
+  font-size: 14px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233f3a34' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+}
+
+.file-meta {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--ink-soft);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .hero,
+  .control-panel,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .range-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  button,
+  .select {
+    width: 100%;
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-text">
+        <p class="tag">SplitBook Lab</p>
+        <h1>拆书工坊</h1>
+        <p class="subtitle">导入一部文本，一键拆解成清晰章节。支持复制单章、选择 1~n 章节拆解导出。</p>
+      </div>
+      <div class="hero-card">
+        <div class="card-title">快速开始</div>
+        <ol>
+          <li>导入 TXT 文本文件或拖拽到窗口</li>
+          <li>自动识别章节目录</li>
+          <li>选择章节范围进行拆解、复制或导出</li>
+        </ol>
+      </div>
+    </header>
+
+    <section class="control-panel">
+      <div class="upload-panel" id="drop-zone">
+        <div class="upload-text">
+          <h2>导入文本</h2>
+          <p>支持 TXT，最大 50MB。智能识别章节标题。</p>
+        </div>
+        <div class="upload-actions">
+          <input type="file" id="file-input" accept=".txt" hidden />
+          <button class="primary" id="import-btn">选择文件</button>
+          <button class="secondary" id="split-btn" disabled>生成目录</button>
+          <select id="encoding" class="select">
+            <option value="UTF-8" selected>UTF-8</option>
+            <option value="GBK">GBK</option>
+            <option value="GB2312">GB2312</option>
+            <option value="BIG5">BIG5</option>
+          </select>
+        </div>
+        <div class="file-meta" id="file-meta">未导入文件</div>
+      </div>
+
+      <div class="stats-panel">
+        <div class="stat">
+          <span class="stat-label">章节数</span>
+          <span class="stat-value" id="chapter-count">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">总字数</span>
+          <span class="stat-value" id="char-count">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">最近拆解</span>
+          <span class="stat-value" id="last-action">—</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="range-panel">
+      <div class="range-controls">
+        <h2>章节范围拆解</h2>
+        <div class="range-fields">
+          <label>
+            起始章节
+            <select id="range-start" class="select"></select>
+          </label>
+          <label>
+            结束章节
+            <select id="range-end" class="select"></select>
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="include-title" checked />
+            <span>包含章节标题</span>
+          </label>
+        </div>
+      </div>
+      <div class="range-actions">
+        <button class="secondary" id="preview-range" disabled>开始拆解预览</button>
+        <button class="secondary" id="copy-range" disabled>复制范围</button>
+        <button class="primary" id="export-range" disabled>导出范围 TXT</button>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <div class="chapter-list" id="chapter-list">
+        <div class="list-header">
+          <div>
+            <h2>章节列表</h2>
+            <p class="list-meta" id="list-meta">未导入</p>
+          </div>
+          <button class="ghost" id="load-more" disabled>加载更多</button>
+        </div>
+        <div class="chapter-items" id="chapter-items">
+          <div class="empty">等待导入文本后展示章节列表</div>
+        </div>
+      </div>
+      <div class="preview-panel">
+        <div class="preview-header">
+          <h2>拆解结果</h2>
+          <button class="ghost" id="copy-preview">复制预览</button>
+        </div>
+        <textarea id="preview" placeholder="在左侧选择章节范围并点击【拆解预览】"></textarea>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <span>拆书工坊 · 让拆解更优雅</span>
+  </footer>
+
+  <script>
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+const state = {
+  rawText: '',
+  chapters: [],
+  previewText: '',
+  renderLimit: 80,
+  bookName: '拆书'
+};
+
+const elements = {
+  fileInput: document.getElementById('file-input'),
+  importBtn: document.getElementById('import-btn'),
+  encoding: document.getElementById('encoding'),
+  dropZone: document.getElementById('drop-zone'),
+  fileMeta: document.getElementById('file-meta'),
+  chapterCount: document.getElementById('chapter-count'),
+  charCount: document.getElementById('char-count'),
+  lastAction: document.getElementById('last-action'),
+  splitBtn: document.getElementById('split-btn'),
+  chapterList: document.getElementById('chapter-list'),
+  chapterItems: document.getElementById('chapter-items'),
+  listMeta: document.getElementById('list-meta'),
+  loadMore: document.getElementById('load-more'),
+  rangeStart: document.getElementById('range-start'),
+  rangeEnd: document.getElementById('range-end'),
+  includeTitle: document.getElementById('include-title'),
+  previewRange: document.getElementById('preview-range'),
+  copyRange: document.getElementById('copy-range'),
+  exportRange: document.getElementById('export-range'),
+  preview: document.getElementById('preview'),
+  copyPreview: document.getElementById('copy-preview')
+};
+
+const chapterRegex = /(?:^|\n)\s*(?:###\s*)?(?:第[0-9一二三四五六七八九十百千万零]+[章节回卷篇部]|章节[0-9一二三四五六七八九十百千万零]+)\s*[：:]?[^\n#]*(?:###)?(?=\n|$)/g;
+
+const formatNumber = (value) => value.toLocaleString('zh-CN');
+
+const setStatus = (message) => {
+  elements.lastAction.textContent = message;
+};
+
+const updateStats = () => {
+  elements.chapterCount.textContent = formatNumber(state.chapters.length);
+  elements.charCount.textContent = formatNumber(state.rawText.length || 0);
+};
+
+const resetRangeSelectors = () => {
+  elements.rangeStart.innerHTML = '';
+  elements.rangeEnd.innerHTML = '';
+
+  if (state.chapters.length === 0) {
+    const option = new Option('—', '');
+    elements.rangeStart.append(option.cloneNode(true));
+    elements.rangeEnd.append(option.cloneNode(true));
+    elements.rangeStart.disabled = true;
+    elements.rangeEnd.disabled = true;
+    updateRangeActions();
+    return;
+  }
+
+  elements.rangeStart.disabled = false;
+  elements.rangeEnd.disabled = false;
+
+  elements.rangeStart.append(new Option('请选择章节', ''));
+  elements.rangeEnd.append(new Option('请选择章节', ''));
+
+  state.chapters.forEach((chapter, index) => {
+    const label = `${index + 1}. ${chapter.title}`;
+    elements.rangeStart.append(new Option(label, index));
+    elements.rangeEnd.append(new Option(label, index));
+  });
+  updateRangeActions();
+};
+
+const ensureRangeOrder = () => {
+  const start = parseInt(elements.rangeStart.value, 10);
+  const end = parseInt(elements.rangeEnd.value, 10);
+
+  if (Number.isNaN(start) || Number.isNaN(end)) return;
+
+  if (start > end) {
+    elements.rangeEnd.value = start;
+  }
+};
+
+const isRangeSelected = () => {
+  const start = elements.rangeStart.value;
+  const end = elements.rangeEnd.value;
+  return start !== '' && end !== '';
+};
+
+const updateRangeActions = () => {
+  const enabled = isRangeSelected();
+  elements.previewRange.disabled = !enabled;
+  elements.copyRange.disabled = !enabled;
+  elements.exportRange.disabled = !enabled;
+};
+
+const buildRangeText = () => {
+  if (!isRangeSelected()) {
+    setStatus('请先选择章节范围');
+    return '';
+  }
+
+  const start = parseInt(elements.rangeStart.value, 10);
+  const end = parseInt(elements.rangeEnd.value, 10);
+  if (Number.isNaN(start) || Number.isNaN(end)) return '';
+
+  const includeTitle = elements.includeTitle.checked;
+  const selected = state.chapters.slice(start, end + 1);
+
+  return selected
+    .map((chapter) => {
+      if (includeTitle) {
+        return `${chapter.title}\n${chapter.content}`.trim();
+      }
+      return chapter.content.trim();
+    })
+    .filter(Boolean)
+    .join('\n\n');
+};
+
+const showPreview = () => {
+  const text = buildRangeText();
+  state.previewText = text;
+  elements.preview.value = text;
+  if (text) {
+    setStatus('已生成拆解预览');
+  }
+};
+
+const copyText = async (text) => {
+  if (!text) return;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    setStatus('已复制到剪贴板');
+  } catch (error) {
+    const fallback = document.createElement('textarea');
+    fallback.value = text;
+    document.body.appendChild(fallback);
+    fallback.select();
+    document.execCommand('copy');
+    document.body.removeChild(fallback);
+    setStatus('已复制到剪贴板');
+  }
+};
+
+const downloadText = (text, filename) => {
+  if (!text) return;
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+  setStatus('已导出文本');
+};
+
+const sanitizeFileName = (name) => {
+  return name.replace(/[\\/:*?"<>|]+/g, '').trim() || '拆书';
+};
+
+const parseChapters = (text) => {
+  const matches = [];
+  let match;
+
+  while ((match = chapterRegex.exec(text)) !== null) {
+    matches.push({
+      title: match[0].trim(),
+      index: match.index,
+      length: match[0].length
+    });
+  }
+
+  if (matches.length === 0) return [];
+
+  return matches.map((current, idx) => {
+    let contentStart = current.index + current.length;
+    if (text[contentStart] === '\r' && text[contentStart + 1] === '\n') {
+      contentStart += 2;
+    } else if (text[contentStart] === '\n') {
+      contentStart += 1;
+    }
+
+    const next = matches[idx + 1];
+    const contentEnd = next ? next.index : text.length;
+    const content = text.slice(contentStart, contentEnd).trim();
+
+    return {
+      id: idx + 1,
+      title: current.title,
+      content,
+      charCount: content.length
+    };
+  });
+};
+
+const renderChapters = () => {
+  elements.chapterItems.innerHTML = '';
+
+  if (state.chapters.length === 0) {
+    elements.chapterItems.innerHTML = '<div class="empty">没有识别到章节，请确认章节标题格式。</div>';
+    elements.listMeta.textContent = '未导入';
+    elements.loadMore.disabled = true;
+    return;
+  }
+
+  const visibleCount = Math.min(state.renderLimit, state.chapters.length);
+  elements.listMeta.textContent = `已显示 ${visibleCount} / ${state.chapters.length} 章`;
+  elements.loadMore.disabled = visibleCount >= state.chapters.length;
+
+  state.chapters.slice(0, visibleCount).forEach((chapter) => {
+    const card = document.createElement('div');
+    card.className = 'chapter-card';
+
+    const title = document.createElement('div');
+    title.className = 'chapter-title';
+    title.textContent = `${chapter.id}. ${chapter.title}`;
+
+    const meta = document.createElement('div');
+    meta.className = 'chapter-meta';
+    meta.innerHTML = `<span>${formatNumber(chapter.charCount)} 字</span>`;
+
+    const actions = document.createElement('div');
+    actions.className = 'chapter-actions';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'secondary';
+    copyBtn.textContent = '复制内容';
+    copyBtn.addEventListener('click', () => copyText(chapter.content));
+
+    const copyWithTitleBtn = document.createElement('button');
+    copyWithTitleBtn.className = 'secondary';
+    copyWithTitleBtn.textContent = '复制含标题';
+    copyWithTitleBtn.addEventListener('click', () => copyText(`${chapter.title}\n${chapter.content}`));
+
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'primary';
+    exportBtn.textContent = '导出本章';
+    exportBtn.addEventListener('click', () => {
+      const safeName = sanitizeFileName(state.bookName);
+      downloadText(`${chapter.title}\n${chapter.content}`.trim(), `${safeName}-第${chapter.id}章.txt`);
+    });
+
+    actions.append(copyBtn, copyWithTitleBtn, exportBtn);
+
+    card.append(title, meta, actions);
+    elements.chapterItems.appendChild(card);
+  });
+};
+
+const handleTextLoaded = (text, fileName) => {
+  state.rawText = text;
+  state.chapters = [];
+  state.previewText = '';
+  state.bookName = sanitizeFileName((fileName || '').replace(/\.[^/.]+$/, '')) || '拆书';
+  updateStats();
+  resetRangeSelectors();
+  elements.preview.value = '';
+  elements.fileMeta.textContent = fileName ? `${fileName} · ${formatNumber(text.length)} 字` : '文本已加载';
+  elements.chapterItems.innerHTML = '<div class="empty">文本已导入，点击生成目录展示章节列表。</div>';
+  elements.listMeta.textContent = '待生成';
+  elements.loadMore.disabled = true;
+  updateRangeActions();
+  elements.splitBtn.disabled = false;
+  setStatus('文本已导入，点击生成目录');
+};
+
+const readFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('读取失败'));
+    reader.onload = () => resolve(reader.result);
+    reader.readAsText(file, elements.encoding.value);
+  });
+};
+
+const handleFile = async (file) => {
+  if (!file) return;
+  if (file.size > MAX_FILE_SIZE) {
+    setStatus('文件过大，请选择小于 50MB 的文本');
+    return;
+  }
+
+  try {
+    const text = await readFile(file);
+    handleTextLoaded(text, file.name);
+  } catch (error) {
+    setStatus('读取失败，请尝试切换编码');
+  }
+};
+
+const splitCurrentText = () => {
+  if (!state.rawText) {
+    setStatus('请先导入文本');
+    return;
+  }
+
+  state.chapters = parseChapters(state.rawText);
+  state.renderLimit = 80;
+  updateStats();
+  resetRangeSelectors();
+  renderChapters();
+
+  if (state.chapters.length === 0) {
+    elements.preview.value = '';
+    state.previewText = '';
+    setStatus('未识别到章节，请检查文本格式');
+    return;
+  }
+
+  setStatus('目录已生成，可选择章节范围进行拆解');
+};
+
+elements.importBtn.addEventListener('click', () => {
+  elements.fileInput.click();
+});
+
+elements.fileInput.addEventListener('change', (event) => {
+  const file = event.target.files?.[0];
+  handleFile(file);
+});
+
+elements.dropZone.addEventListener('dragover', (event) => {
+  event.preventDefault();
+  elements.dropZone.classList.add('dragover');
+});
+
+elements.dropZone.addEventListener('dragleave', () => {
+  elements.dropZone.classList.remove('dragover');
+});
+
+elements.dropZone.addEventListener('drop', (event) => {
+  event.preventDefault();
+  elements.dropZone.classList.remove('dragover');
+  const file = event.dataTransfer.files?.[0];
+  handleFile(file);
+});
+
+elements.splitBtn.addEventListener('click', splitCurrentText);
+
+elements.rangeStart.addEventListener('change', () => {
+  if (elements.rangeEnd.value === '' && elements.rangeStart.value !== '') {
+    elements.rangeEnd.value = elements.rangeStart.value;
+  }
+  ensureRangeOrder();
+  updateRangeActions();
+});
+
+elements.rangeEnd.addEventListener('change', () => {
+  if (elements.rangeStart.value === '' && elements.rangeEnd.value !== '') {
+    elements.rangeStart.value = elements.rangeEnd.value;
+  }
+  ensureRangeOrder();
+  updateRangeActions();
+});
+
+elements.previewRange.addEventListener('click', showPreview);
+
+elements.copyRange.addEventListener('click', () => {
+  const text = buildRangeText();
+  state.previewText = text;
+  elements.preview.value = text;
+  copyText(text);
+});
+
+elements.exportRange.addEventListener('click', () => {
+  const text = buildRangeText();
+  state.previewText = text;
+  elements.preview.value = text;
+  if (!text) return;
+
+  const start = parseInt(elements.rangeStart.value, 10) + 1;
+  const end = parseInt(elements.rangeEnd.value, 10) + 1;
+  const safeName = sanitizeFileName(state.bookName);
+  downloadText(text, `${safeName}-第${start}章-第${end}章.txt`);
+});
+
+elements.copyPreview.addEventListener('click', () => {
+  copyText(elements.preview.value);
+});
+
+elements.loadMore.addEventListener('click', () => {
+  state.renderLimit += 80;
+  renderChapters();
+});
+
+updateStats();
+resetRangeSelectors();
+setStatus('等待导入文本');
+  </script>
+</body>
+</html>
